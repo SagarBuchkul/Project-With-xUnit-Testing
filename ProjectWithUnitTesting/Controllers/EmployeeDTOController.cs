@@ -92,10 +92,24 @@ namespace ProjectWithUnitTesting.Controllers
         [HttpPost]
         public async Task<ActionResult<EmployeeDTO>> PostEmployeeDTO(EmployeeDTO employeeDTO)
         {
-          if (_context.Employees == null)
-          {
-              return Problem("Entity set 'TodoContext.Employees'  is null.");
-          }
+            if (_context.Employees == null)
+            {
+                return Problem("Entity set 'TodoContext.Employees'  is null.");
+            }
+
+            // Check if the model is valid based on data annotations and other validation rules defined in the EmployeeDTO class.
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Additional custom data validation, if needed.
+            if (employeeDTO.Salary <= 0)
+            {
+                ModelState.AddModelError("Salary", "Salary must be greater than zero.");
+                return BadRequest(ModelState);
+            }
+
             _context.Employees.Add(employeeDTO);
             await _context.SaveChangesAsync();
 
